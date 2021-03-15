@@ -34,6 +34,7 @@
 void check_mode();
 void io_setup();
 void adc_setup();
+void start_conversion();
 float adc_read(char channel);
 
 int mode = 0;
@@ -69,8 +70,8 @@ int main()
 				
 				Vout = adc_read(temp_pin);	
 				temp = Vout / 10;
-				
-				ftoa(temp,str,10);
+
+				dtostrf(temp,6, 2, str);
 				
 				lcd_gotoxy(0,1);
 				lcd_print(str);
@@ -128,7 +129,13 @@ void io_setup()
 void adc_setup()
 {
 	ADMUX |= (1 << REFS0);
-	ADCSRA = (1 << ADEN) | (1 << ADPS0) | 1 << ADPS1 ) | 1 << ADPS2);
+	ADCSRA = (1 << ADEN) | (1 << ADPS0) | (1 << ADPS1 ) | (1 << ADPS2); 
+	start_conversion();
+}
+
+void start_conversion()
+{
+	ADCSRA |= (1 << ADSC);
 }
 
 float adc_read(char channel)
@@ -137,10 +144,10 @@ float adc_read(char channel)
 	
 	ADMUX |= (channel & 0x0f);
 	
-	ADSCRA |= (1 << ADSC);
-	while((ADCSRA & (1 << ADIF)) == 0);
+	start_conversion();
+	while(!(ADCSRA & (1<<ADSC)));
 	
-	Vout = ADC * (5/1024);
+	Vout = ADCH * (5/1024);
 	
 	return Vout;	
 }
