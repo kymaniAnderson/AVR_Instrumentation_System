@@ -23,7 +23,6 @@
 	ADMUX sets the reference voltage as well as the pin we are using
 */
 
-#define F_CPU 8000000UL
 #define temp_pin 1
 
 #include <avr/io.h>
@@ -32,11 +31,17 @@
 #include <util/delay.h>
 #include <stdlib.h>
 
+void check_mode();
+void io_setup();
+void adc_setup();
+float adc_read(char channel);
+
 int mode = 0;
 
 int main() 
 {	
 	int temp, Vout;
+	char str[20];
 
 	io_setup();
 	lcd_init();
@@ -62,7 +67,7 @@ int main()
 				lcd_gotoxy(0,0);
 				lcd_print("Temperature");
 				
-				Vout = ADC_read(temp_pin);	
+				Vout = adc_read(temp_pin);	
 				temp = Vout / 10;
 				
 				ftoa(temp,str,10);
@@ -78,7 +83,7 @@ int main()
 				lcd_gotoxy(0,0);
 				lcd_print("Inductance Mode");
             break;
-			 case 6:
+			case 6:
 				lcd_gotoxy(0,0);
 				lcd_print("Distance Mode");
             break;
@@ -126,18 +131,14 @@ void adc_setup()
 	ADCSRA = (1 << ADEN) | (1 << ADPS0) | 1 << ADPS1 ) | 1 << ADPS2);
 }
 
-void adc_conversion()
-{
-	ADSCRA |= (1 << ADSC);
-	while((ADCSRA & (1 << ADIF)) == 0);
-}
-
 float adc_read(char channel)
 {
 	int Vout;
 	
-	ADMUX |= (channel & 0x0f)
-	adc_conversion();
+	ADMUX |= (channel & 0x0f);
+	
+	ADSCRA |= (1 << ADSC);
+	while((ADCSRA & (1 << ADIF)) == 0);
 	
 	Vout = ADC * (5/1024);
 	
