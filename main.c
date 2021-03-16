@@ -53,19 +53,19 @@ int main()
 		switch (mode)
         {
             case 0:
-				lcd_gotoxy(0,0);
+				lcd_gotoxy(1, 1);
 				lcd_print("Voltmeter Mode");
             break;
             case 1:
-				lcd_gotoxy(0,0);
+				lcd_gotoxy(1, 1);
 				lcd_print("Capacitance Mode");
             break;
             case 2:
-				lcd_gotoxy(0,0);
+				lcd_gotoxy(1, 1);
 				lcd_print("Resistance Mode");
             break;
 			 case 3:
-				lcd_gotoxy(0,0);
+				lcd_gotoxy(1, 1);
 				lcd_print("Temperature");
 				
 				Vout = adc_read(temp_pin);	
@@ -73,19 +73,19 @@ int main()
 
 				dtostrf(temp,6, 2, str);
 				
-				lcd_gotoxy(0,1);
+				lcd_gotoxy(1,2);
 				lcd_print(str);
             break;
             case 4:
-				lcd_gotoxy(0,0);
+				lcd_gotoxy(1, 1);
 				lcd_print("Frequency Mode");
             break;
             case 5:
-				lcd_gotoxy(0,0);
+				lcd_gotoxy(1, 1);
 				lcd_print("Inductance Mode");
             break;
 			case 6:
-				lcd_gotoxy(0,0);
+				lcd_gotoxy(1, 1);
 				lcd_print("Distance Mode");
             break;
         }
