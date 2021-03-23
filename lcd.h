@@ -1,19 +1,3 @@
-#ifndef F_CPU
-#define F_CPU 8000000UL // 8 MHz clock speed
-#endif
-
-// To change if the ports are different:
-#define D0 eS_PORTD0
-#define D1 eS_PORTD1
-#define D2 eS_PORTD2
-#define D3 eS_PORTD3
-#define D4 eS_PORTD4
-#define D5 eS_PORTD5
-#define D6 eS_PORTD6
-#define D7 eS_PORTD7
-#define RS eS_PORTC6
-#define EN eS_PORTC7
-
 //LCD Functions Developed by electroSome
 #define eS_PORTA0 0
 #define eS_PORTA1 1
@@ -57,7 +41,7 @@
 
 #include<util/delay.h>
 
-void pinSet(int a, int b)
+void pinChange(int a, int b)
 {
 	if(b == 0)
 	{
@@ -195,109 +179,236 @@ void pinSet(int a, int b)
 	}
 }
 
-void LCD_Port(char a) {
+
+
+//LCD 8 Bit Interfacing Functions
+void Lcd8_Port(char a)
+{
 	if(a & 1)
-		pinSet(D0,1);
+	pinChange(D0,1);
 	else
-		pinSet(D0,0);
+	pinChange(D0,0);
 	
 	if(a & 2)
-		pinSet(D1,1);
+	pinChange(D1,1);
 	else
-		pinSet(D1,0);
+	pinChange(D1,0);
 	
 	if(a & 4)
-		pinSet(D2,1);
+	pinChange(D2,1);
 	else
-		pinSet(D2,0);
+	pinChange(D2,0);
 	
 	if(a & 8)
-		pinSet(D3,1);
+	pinChange(D3,1);
 	else
-		pinSet(D3,0);
+	pinChange(D3,0);
 	
 	if(a & 16)
-		pinSet(D4,1);
+	pinChange(D4,1);
 	else
-		pinSet(D4,0);
+	pinChange(D4,0);
 
 	if(a & 32)
-		pinSet(D5,1);
+	pinChange(D5,1);
 	else
-		pinSet(D5,0);
+	pinChange(D5,0);
 	
 	if(a & 64)
-		pinSet(D6,1);
+	pinChange(D6,1);
 	else
-		pinSet(D6,0);
+	pinChange(D6,0);
 	
 	if(a & 128)
-		pinSet(D7,1);
+	pinChange(D7,1);
 	else
-		pinSet(D7,0);
+	pinChange(D7,0);
 }
-
-void LCD_Cmd(char a) {
-	pinSet(RS,0);             // => RS = 0
-	LCD_Port(a);             // Data transfer
-	pinSet(EN,1);            // => E = 1
+void Lcd8_Cmd(char a)
+{
+	pinChange(RS,0);             // => RS = 0
+	Lcd8_Port(a);             //Data transfer
+	pinChange(EN,1);             // => E = 1
 	_delay_ms(1);
-	pinSet(EN,0);            // => E = 0
+	pinChange(EN,0);             // => E = 0
 	_delay_ms(1);
 }
 
-void LCD_Clear() {
-	LCD_Cmd(1);
+void Lcd8_Clear()
+{
+	Lcd8_Cmd(1);
 }
 
-void LCD_Set_Cursor(char a, char b) {
+void Lcd8_Set_Cursor(char a, char b)
+{
 	if(a == 1)
-		LCD_Cmd(0x80 + b);
+	Lcd8_Cmd(0x80 + b);
 	else if(a == 2)
-		LCD_Cmd(0xC0 + b);
+	Lcd8_Cmd(0xC0 + b);
 }
 
-void LCD_Reset(){
-	LCD_Cmd(0x30);
-	_delay_ms(5);
-	LCD_Cmd(0x30);
-	_delay_ms(1);
-	LCD_Cmd(0x30);
-	_delay_ms(10);
-}
-
-void LCD_Init() {
-	pinSet(RS,0);
-	pinSet(EN,0);
+void Lcd8_Init()
+{
+	pinChange(RS,0);
+	pinChange(EN,0);
 	_delay_ms(20);
 	///////////// Reset process from datasheet /////////
-	LCD_Reset();
+	Lcd8_Cmd(0x30);
+	_delay_ms(5);
+	Lcd8_Cmd(0x30);
+	_delay_ms(1);
+	Lcd8_Cmd(0x30);
+	_delay_ms(10);
 	/////////////////////////////////////////////////////
-	LCD_Cmd(0x38);    //function set
-	LCD_Cmd(0x0C);    //display on,cursor off,blink off
-	LCD_Cmd(0x01);    //clear display
-	LCD_Cmd(0x06);    //entry mode, set increment
+	Lcd8_Cmd(0x38);    //function set
+	Lcd8_Cmd(0x0C);    //display on,cursor off,blink off
+	Lcd8_Cmd(0x01);    //clear display
+	Lcd8_Cmd(0x06);    //entry mode, set increment
 }
 
-void LCD_Wc(char a) {
-	pinSet(RS,1);             // => RS = 1
-	LCD_Port(a);             //Data transfer
-	pinSet(EN,1);             // => E = 1
+void Lcd8_Write_Char(char a)
+{
+	pinChange(RS,1);             // => RS = 1
+	Lcd8_Port(a);             //Data transfer
+	pinChange(EN,1);             // => E = 1
 	_delay_ms(1);
-	pinSet(EN,0);             // => E = 04
+	pinChange(EN,0);             // => E = 04
 	_delay_ms(1);
 }
 
-void LCD_Ws(char *a) {
+void Lcd8_Write_String(char *a)
+{
 	int i;
 	for(i=0;a[i]!='\0';i++)
-		LCD_Wc(a[i]);
+	Lcd8_Write_Char(a[i]);
 }
 
-void LCD_Shift_Right() {
-	LCD_Cmd(0x1C);
+void Lcd8_Shift_Right()
+{
+	Lcd8_Cmd(0x1C);
 }
 
-void LCD_Shift_Left() {
-	LCD_Cmd(0x18);
+void Lcd8_Shift_Left()
+{
+	Lcd8_Cmd(0x18);
 }
+//End LCD 8 Bit Interfacing Functions
+
+//LCD 4 Bit Interfacing Functions
+
+void Lcd4_Port(char a)
+{
+	if(a & 1)
+	pinChange(D4,1);
+	else
+	pinChange(D4,0);
+	
+	if(a & 2)
+	pinChange(D5,1);
+	else
+	pinChange(D5,0);
+	
+	if(a & 4)
+	pinChange(D6,1);
+	else
+	pinChange(D6,0);
+	
+	if(a & 8)
+	pinChange(D7,1);
+	else
+	pinChange(D7,0);
+}
+void Lcd4_Cmd(char a)
+{
+	pinChange(RS,0);             // => RS = 0
+	Lcd4_Port(a);
+	pinChange(EN,1);            // => E = 1
+	_delay_ms(1);
+	pinChange(EN,0);             // => E = 0
+	_delay_ms(1);
+}
+
+void Lcd4_Clear()
+{
+	Lcd4_Cmd(0);
+	Lcd4_Cmd(1);
+}
+
+void Lcd4_Set_Cursor(char a, char b)
+{
+	char temp,z,y;
+	if(a == 1)
+	{
+		temp = 0x80 + b;
+		z = temp>>4;
+		y = (0x80+b) & 0x0F;
+		Lcd4_Cmd(z);
+		Lcd4_Cmd(y);
+	}
+	else if(a == 2)
+	{
+		temp = 0xC0 + b;
+		z = temp>>4;
+		y = (0xC0+b) & 0x0F;
+		Lcd4_Cmd(z);
+		Lcd4_Cmd(y);
+	}
+}
+
+void Lcd4_Init()
+{
+	Lcd4_Port(0x00);
+	_delay_ms(20);
+	///////////// Reset process from datasheet /////////
+	Lcd4_Cmd(0x03);
+	_delay_ms(5);
+	Lcd4_Cmd(0x03);
+	_delay_ms(11);
+	Lcd4_Cmd(0x03);
+	/////////////////////////////////////////////////////
+	Lcd4_Cmd(0x02);
+	Lcd4_Cmd(0x02);
+	Lcd4_Cmd(0x08);
+	Lcd4_Cmd(0x00);
+	Lcd4_Cmd(0x0C);
+	Lcd4_Cmd(0x00);
+	Lcd4_Cmd(0x06);
+}
+
+void Lcd4_Write_Char(char a)
+{
+	char temp,y;
+	temp = a&0x0F;
+	y = a&0xF0;
+	pinChange(RS,1);             // => RS = 1
+	Lcd4_Port(y>>4);             //Data transfer
+	pinChange(EN,1);
+	_delay_ms(1);
+	pinChange(EN,0);
+	_delay_ms(1);
+	Lcd4_Port(temp);
+	pinChange(EN,1);
+	_delay_ms(1);
+	pinChange(EN,0);
+	_delay_ms(1);
+}
+
+void Lcd4_Write_String(char *a)
+{
+	int i;
+	for(i=0;a[i]!='\0';i++)
+	Lcd4_Write_Char(a[i]);
+}
+
+void Lcd4_Shift_Right()
+{
+	Lcd4_Cmd(0x01);
+	Lcd4_Cmd(0x0C);
+}
+
+void Lcd4_Shift_Left()
+{
+	Lcd4_Cmd(0x01);
+	Lcd4_Cmd(0x08);
+}
+//End LCD 4 Bit Interfacing Functions

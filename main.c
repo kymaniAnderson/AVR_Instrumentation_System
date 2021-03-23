@@ -29,10 +29,10 @@
 #endif
 
 /*======= LCD Data Ports =======*/
-#define C4 eS_PORTC4
-#define C5 eS_PORTC5
-#define C6 eS_PORTC6
-#define C7 eS_PORTC7
+#define D4 eS_PORTC4
+#define D5 eS_PORTC5
+#define D6 eS_PORTC6
+#define D7 eS_PORTC7
 
 /*======= Register-Select and Enable =======*/
 #define RS eS_PORTC1
@@ -183,9 +183,9 @@ float adc_read(char channel)
 	ADMUX |= (channel & 0xFF);
 	
 	start_conversion();
-	while(!(ADCSRA & (1<<ADSC)));
+	while(!(ADCSRA & (1 << ADSC)));
 	
-	Vout = ADC * (5/1024);
+	Vout = ADCL * (5/1024);
 	
 	return Vout;	
 }
