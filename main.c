@@ -23,20 +23,38 @@
 	ADMUX sets the reference voltage as well as the pin we are using
 */
 
+/*======= 8MHz External Crystal Attached =======*/
+#ifndef F_CPU
+#define F_CPU 8000000UL 
+#endif
+
+/*======= LCD Data Ports =======*/
+#define C4 eS_PORTC4
+#define C5 eS_PORTC5
+#define C6 eS_PORTC6
+#define C7 eS_PORTC7
+
+/*======= Register-Select and Enable =======*/
+#define RS eS_PORTC1
+#define EN eS_PORTC3
+
 #define temp_pin 1
 
+/*======= List of Libraries =======*/
 #include <avr/io.h>
+#include <stdlib.h>
+#include <util/delay.h>
 #include <avr/interrupt.h>
 #include "lcd.h"
-#include <util/delay.h>
-#include <stdlib.h>
 
+/*======= Functions =======*/
 void check_mode();
 void io_setup();
 void adc_setup();
 void start_conversion();
 float adc_read(char channel);
 
+/*======= Global Variables =======*/
 int mode = 0;
 
 int main() 
@@ -45,7 +63,7 @@ int main()
 	char str[20];
 
 	io_setup();
-	lcd_init();
+	Lcd4_Init();
 	adc_setup();
 	
 	while (1)
@@ -53,40 +71,60 @@ int main()
 		switch (mode)
         {
             case 0:
-				lcd_gotoxy(1, 1);
-				lcd_print("Voltmeter Mode");
+				_delay_ms(50);
+				Lcd4_Clear();
+
+				Lcd4_Set_Cursor(1,1);
+				Lcd4_Write_String("Voltmeter Mode");
             break;
             case 1:
-				lcd_gotoxy(1, 1);
-				lcd_print("Capacitance Mode");
+				_delay_ms(50);
+				Lcd4_Clear();
+
+				Lcd4_Set_Cursor(1,1);
+				Lcd4_Write_String("Capacitance Mode");
             break;
             case 2:
-				lcd_gotoxy(1, 1);
-				lcd_print("Resistance Mode");
+				_delay_ms(50);
+				Lcd4_Clear();
+
+				Lcd4_Set_Cursor(1,1);
+				Lcd4_Write_String("Resistance Mode");
             break;
 			 case 3:
-				lcd_gotoxy(1, 1);
-				lcd_print("Temperature");
+				_delay_ms(50);
+				Lcd4_Clear();
+
+				Lcd4_Set_Cursor(1,1);
+				Lcd4_Write_String("Temperature");
 				
 				Vout = adc_read(temp_pin);	
 				temp = Vout / 10;
 
 				dtostrf(temp,6, 2, str);
-				
-				lcd_gotoxy(1,2);
-				lcd_print(str);
+				Lcd4_Set_Cursor(2,1);
+				Lcd4_Write_String(str);
             break;
             case 4:
-				lcd_gotoxy(1, 1);
-				lcd_print("Frequency Mode");
+				_delay_ms(50);
+				Lcd4_Clear();
+
+				Lcd4_Set_Cursor(1,1);
+				Lcd4_Write_String("Frequency Mode");
             break;
             case 5:
-				lcd_gotoxy(1, 1);
-				lcd_print("Inductance Mode");
+				_delay_ms(50);
+				Lcd4_Clear();
+
+				Lcd4_Set_Cursor(1,1);
+				Lcd4_Write_String("Inductance Mode");
             break;
 			case 6:
-				lcd_gotoxy(1, 1);
-				lcd_print("Distance Mode");
+				_delay_ms(50);
+				Lcd4_Clear();
+
+				Lcd4_Set_Cursor(1,1);
+				Lcd4_Write_String("Distance Mode");
             break;
         }
         
@@ -147,7 +185,7 @@ float adc_read(char channel)
 	start_conversion();
 	while(!(ADCSRA & (1<<ADSC)));
 	
-	Vout = ADCH * (5/1024);
+	Vout = ADC * (5/1024);
 	
 	return Vout;	
 }
