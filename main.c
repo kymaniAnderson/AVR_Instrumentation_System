@@ -180,7 +180,7 @@ float adc_read(char channel)
 {
 	int Vout;
 	
-	ADMUX |= (channel & 0x0f);
+	ADMUX |= (channel & 0xFF);
 	
 	start_conversion();
 	while(!(ADCSRA & (1<<ADSC)));
